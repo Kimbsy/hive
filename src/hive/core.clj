@@ -10,45 +10,31 @@
 (def hex-width (* hex-size (Math/sqrt 3)))
 (def hex-height (* hex-size 2))
 
+(defn generate-row
+  [start end i]
+  (let [color (if (odd? i) dark-blue light-blue)]
+    (reduce (fn [results q]
+              (conj results {q {:color color}}))
+            {}
+            (range start end))))
+
+(defn hex-map
+  [size]
+  (let [width (inc (* size 2))]
+    (reduce (fn [results i]
+              (let [start (if (< i size)
+                            (- size i)
+                            0)
+                    end   (if (< i size)
+                            width
+                            (+ width (- size i)))]
+                (conj results {i (generate-row start end i)})))
+            {}
+            (range width))))
+
 (defn setup []
-  (q/frame-rate 20)
-  {:hexes {0 {3 {:color dark-blue}
-              4 {:color dark-blue}
-              5 {:color dark-blue}
-              6 {:color dark-blue}}
-           1 {2 {:color light-blue}
-              3 {:color light-blue}
-              4 {:color light-blue}
-              5 {:color light-blue}
-              6 {:color light-blue}}
-           2 {1 {:color dark-blue}
-              2 {:color dark-blue}
-              3 {:color dark-blue}
-              4 {:color dark-blue}
-              5 {:color dark-blue}
-              6 {:color dark-blue}}
-           3 {0 {:color light-blue}
-              1 {:color light-blue}
-              2 {:color light-blue}
-              3 {:color light-blue}
-              4 {:color light-blue}
-              5 {:color light-blue}
-              6 {:color light-blue}}
-           4 {0 {:color dark-blue}
-              1 {:color dark-blue}
-              2 {:color dark-blue}
-              3 {:color dark-blue}
-              4 {:color dark-blue}
-              5 {:color dark-blue}}
-           5 {0 {:color light-blue}
-              1 {:color light-blue}
-              2 {:color light-blue}
-              3 {:color light-blue}
-              4 {:color light-blue}}
-           6 {0 {:color dark-blue}
-              1 {:color dark-blue}
-              2 {:color dark-blue}
-              3 {:color dark-blue}}}})
+  (q/frame-rate 60)
+  {:hexes (hex-map 8)})
 
 (defn clear-highlights
   [state]
@@ -137,7 +123,7 @@
 
 (q/defsketch quiltest
   :title "Hex testing"
-  :size [500 500]
+  :size [1200 900]
   :setup setup
   :update update-state
   :draw draw-state
